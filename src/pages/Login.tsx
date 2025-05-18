@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Only if you're using react-router
+import { Link } from 'react-router-dom';
+import { useLogin } from '../hooks/useLogin'; // adjust path if needed
+import { FaSpinner } from 'react-icons/fa'; // for loading spinner
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+  const { loginUser, loading, error } = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setError('Please fill in all fields.');
+      setLocalError('Please fill in all fields.');
       return;
     }
 
-    setError('');
-    // TODO: Send login credentials to backend
-    console.log('Login submitted:', { email, password });
+    setLocalError('');
+    loginUser({ email, password });
   };
 
   return (
@@ -40,12 +42,28 @@ const LoginPage: React.FC = () => {
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
           />
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {(localError || error) && (
+            <div className='flex justify-between'>
+              <p className="text-red-500 text-sm mb-4">{localError || error}</p>
+              <Link to="/forgot-password" className='flex justify-end'>
+                <p className='text-sm text-blue-600 hover:cursor-pointer'>Forgot Password ?</p>
+              </Link>
+            </div>
+          )}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold transition ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+              }`}
           >
-            Login
+            {loading ? (
+              <>
+                <FaSpinner className="animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
         <p className="text-sm text-gray-600 text-center mt-4">

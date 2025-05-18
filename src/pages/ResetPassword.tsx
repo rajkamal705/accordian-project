@@ -1,21 +1,42 @@
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 const ResetPassword: React.FC = () => {
+  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
-    setError('');
-    // TODO: Send password to backend to reset via token
-    console.log('Password reset submitted:', password);
+    try {
+      setLoading(true);
+      setError(null);
+      setMessage('');
+
+      const res = await axiosInstance.post(`/users/reset-password/${token}`, {
+        newPassword: password,
+      });
+
+      setMessage(res.data.message || "Password reset successful");
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err: any) {
+      console.error("Reset error:", err);
+      setError(err.response?.data?.message || err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,12 +60,15 @@ const ResetPassword: React.FC = () => {
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
           />
+
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {message && <p className="text-green-600 text-sm mb-4">{message}</p>}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition hover:cursor-pointer"
           >
-            Submit
+            {loading ? "Processing..." : "Submit"}
           </button>
         </form>
       </div>

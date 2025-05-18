@@ -1,24 +1,46 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Use this if you're using react-router
+import { Link } from 'react-router-dom';
+import { useRegister } from '../hooks/useRegister';
+import { FaSpinner } from 'react-icons/fa';
+
+interface FormData {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const SignupPage: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState<FormData>({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [localError, setLocalError] = useState('');
+  const { registerUser, loading, error } = useRegister();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setLocalError('Passwords do not match');
       return;
     }
 
-    setError('');
-    // TODO: Send signup data to backend
-    console.log('Signup submitted:', { username, email, password });
+    // Clear any previous errors
+    setLocalError('');
+
+    registerUser(formData);
   };
 
   return (
@@ -28,42 +50,61 @@ const SignupPage: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={formData.username}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
+            minLength={6}
           />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={formData.confirmPassword}
+            onChange={handleChange}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
+            minLength={6}
           />
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+          {(localError || error) && (
+            <p className="text-red-500 text-sm mb-4">{localError || error}</p>
+          )}
+          
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold transition ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+              }`}
           >
-            Sign Up
+            {loading ? (
+              <>
+                <FaSpinner className="animate-spin" />
+                Signing Up...
+              </>
+            ) : (
+              'Sign Up'
+            )}
           </button>
         </form>
         <p className="text-sm text-gray-600 text-center mt-4">
