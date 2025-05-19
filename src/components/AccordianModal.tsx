@@ -10,31 +10,79 @@ interface AccordianModalProps {
     setAccordianData: React.Dispatch<React.SetStateAction<AccordianItem[]>>;
 }
 
-function AccordianModal({ handleClose, setAccordianData }: AccordianModalProps,) {
+function AccordianModal({ handleClose, setAccordianData }: AccordianModalProps) {
     const [modalData, setModalData] = useState({
         question: "",
         answer: ""
-    })
+    });
 
-    function handleFormSubmit(e: React.FormEvent) {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setAccordianData(prev => [...prev, modalData]);
-        handleClose();
-    }
+        if (modalData.question.trim() && modalData.answer.trim()) {
+            setAccordianData(prev => [...prev, {
+                question: modalData.question.trim(),
+                answer: modalData.answer.trim()
+            }]);
+            handleClose();
+        }
+    };
 
     return (
-        <div className=''>
-            <div className='bg-black w-96 h-80 rounded-md p-4'>
-                <div className='flex justify-end'>
-                    <button onClick={handleClose} className='bg-white h-10 w-10 rounded-full p-2 hover:cursor-pointer'>x</button>
+        <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Add New FAQ</h2>
+                <button
+                    onClick={handleClose}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Question
+                    </label>
+                    <textarea
+                        value={modalData.question}
+                        onChange={(e) => setModalData(prev => ({ ...prev, question: e.target.value }))}
+                        placeholder="Enter your question..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={3}
+                        autoFocus
+                    />
                 </div>
 
-                <form onSubmit={handleFormSubmit} className='flex flex-col gap-4 mt-4'>
-                    <textarea value={modalData.question} onChange={(e) => setModalData({ ...modalData, 'question': e.target.value })} placeholder='Question' className='px-4 py-2 border border-gray-300 rounded-md bg-white' />
-                    <textarea value={modalData.answer} onChange={(e) => setModalData({ ...modalData, 'answer': e.target.value })} placeholder='Answer' className='px-4 py-2  border border-gray-300 rounded-md bg-white' />
-                    <button type='submit' className='bg-blue-500 rounded-md py-2 text-white font-semibold'>Submit</button>
-                </form>
-            </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Answer
+                    </label>
+                    <textarea
+                        value={modalData.answer}
+                        onChange={(e) => setModalData(prev => ({ ...prev, answer: e.target.value }))}
+                        placeholder="Enter the answer..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows={4}
+                    />
+                </div>
+
+                <div className="flex justify-end gap-4">
+                    <button
+                        type="button"
+                        onClick={handleClose}
+                        className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Add FAQ
+                    </button>
+                </div>
+            </form>
         </div>
     )
 }

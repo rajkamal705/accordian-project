@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 import RootLayout from "./components/RootLayout"
-import Home from "./pages/Home"
+// import Home from "./pages/Home"
 import About from "./components/About"
 import Contact from "./components/Contact"
 import Accordion from "./pages/Accordion"
@@ -26,10 +26,10 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/" element={<RootLayout />}>
-            <Route index element={<Home />} />
+            <Route index element={<Accordion />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/accordion" element={<Accordion />} />
+            {/* <Route path="/accordion" element={<Accordion />} /> */}
           </Route>
         </Routes>
       </Router>

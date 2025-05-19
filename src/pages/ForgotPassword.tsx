@@ -5,13 +5,22 @@ import { FaSpinner } from 'react-icons/fa'; // for loading spinner
 
 const ForgotPassword: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
   const { loading, error, forgotUser, message } = useForgot();
 
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle API call to send password reset link
-    console.log('Reset request sent for:', identifier);
+    if (!isValidEmail(identifier)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    setEmailError('');
     forgotUser(identifier);
   };
 
@@ -28,17 +37,18 @@ const ForgotPassword: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Forgot Password</h2>
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
+            type="email"
             placeholder="Enter Email"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
             required
           />
 
-          {error && <p className="text-red-500 mb-2 text-sm">{error}</p>}
-          {message && <p className="text-green-600 mb-2 text-sm">{message}</p>}
-          
+          {emailError && <p className="text-red-500 text-sm mb-2">{emailError}</p>}
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+          {message && <p className="text-green-600 text-sm mb-2">{message}</p>}
+
           <button
             type="submit"
             disabled={loading}
@@ -48,10 +58,10 @@ const ForgotPassword: React.FC = () => {
             {loading ? (
               <>
                 <FaSpinner className="animate-spin" />
-                verifying...
+                Verifying...
               </>
             ) : (
-              'Login'
+              'Send Reset Link'
             )}
           </button>
         </form>

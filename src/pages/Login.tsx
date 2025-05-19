@@ -42,14 +42,17 @@ const LoginPage: React.FC = () => {
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
             required
           />
-          {(localError || error) && (
-            <div className='flex justify-between'>
-              <p className="text-red-500 text-sm mb-4">{localError || error}</p>
-              <Link to="/forgot-password" className='flex justify-end'>
-                <p className='text-sm text-blue-600 hover:cursor-pointer'>Forgot Password ?</p>
-              </Link>
-            </div>
-          )}
+
+          <div className='flex justify-between mb-4'>
+            {(localError || error) && (
+              <p className="text-red-500 text-sm">{localError || error}</p>
+            )}
+            <Link to="/forgot-password" className='flex justify-end'>
+              <p className='text-sm text-blue-600 hover:cursor-pointer font-semibold'>Forgot Password ?</p>
+            </Link>
+          </div>
+
+
           <button
             type="submit"
             disabled={loading}
